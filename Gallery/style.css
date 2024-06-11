@@ -25,7 +25,7 @@
 .dropdown-item:hover {
   background-color: white;
 }
-.currentpage::before {
+.gallery::before {
   content: "";
   width: 100% !important;
   height: 3px;

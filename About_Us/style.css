@@ -25,6 +25,15 @@
 .dropdown-item:hover {
   background-color: white;
 }
+.about_us::before {
+  content: "";
+  width: 100% !important;
+  height: 3px;
+  background-color: green;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
 .footerlinks a {
   color: green;
   transition: all 0.3s ease-in-out;
@@ -49,23 +58,14 @@ footer .container-fluid {
   background: transparent;
   z-index: 10;
 }
-.currentpage::before {
-  content: "";
-  width: 100% !important;
-  height: 3px;
-  background-color: green;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
-.feedbackbox{
+.feedbackbox {
   padding: 25px 10px 25px 10px;
   transition: all 0.5s ease-in-out;
 }
-.feedbackbox:hover{
+.feedbackbox:hover {
   padding: 25px 20px 25px 20px;
 }
-.abbackground{
+.abbackground {
   background-image: url(https://www.feit.com/cdn/shop/files/IMG_5820-2560x1225_1500x.jpg?v=1659078805);
   background-position: center;
   background-repeat: no-repeat;
