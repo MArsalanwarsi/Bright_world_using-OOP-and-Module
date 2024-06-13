@@ -119,8 +119,7 @@ let nav = ` <nav class="navbar navbar-expand-lg navbar-light bg-light ">
                              data-bs-target="#ShoppingCart" aria-controls="ShoppingCart"><i
                                  class="fa-solid fa-cart-shopping text-success"></i>
                              <span class="position-absolute top-0 translate-middle badge rounded-pill bg-danger cartcounting"
-                                 style="left: 70%;font-size: 10px;">
-     
+                                 style="left: 70%;font-size: 10px;">0
                              </span>
                          </a>
                      </div>
@@ -224,17 +223,13 @@ let nav = ` <nav class="navbar navbar-expand-lg navbar-light bg-light ">
                      <div class="offcanvas-body">
                          <div class="container-fluid  mb-5">
                              <div class="row" id="ShoppingCartBody">
-                                 <h5 class="text-center text-danger">No items in your cart</h5>
+                                 
                              </div>
                          </div>
                      </div>
-                     <div class=" p-5 bg-light ">
-                         <div class="d-flex justify-content-start align-items-center gap-5 text-dark ">
-                             <span class="h4"><span>Total: </span><span class="text-success totalamount">200</span> RS</span>
-                             <a class="btn btn-outline-success" href="#" style="box-shadow: 2px 2px black;">Checkout</a>
-                         </div>
+                     <div class="container-fluid spc_footer">
+                    
                      </div>
-     
                  </div>
                  <!-- offcanvas shoppingcart end -->
      
@@ -248,7 +243,7 @@ let loginbtn = () => {
     login_data.innerHTML = `<button type="button" class="btn btn-outline-success w-auto" id="sign_in">Sign in <i class="bi bi-box-arrow-in-right"></i></button>`;
     let sign_in = document.querySelector("#sign_in");
     sign_in.addEventListener("click", () => {
-      window.location.assign("Login and Register/login.html");
+      window.location.assign("/Login and Register/login.html");
     });
   } else {
     login_data.innerHTML = `<h6>Welcome: <i><span id="login_user" class="h5">${username}</span></i></h6>
@@ -263,26 +258,54 @@ let loginbtn = () => {
 };
 
 let shoppingcart = () => {
-  let json_url =
-    "https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart";
-  fetch(json_url)
-    .then((res) => res.json())
-    .then((data) => {
-      var cartcount = 0;
-      var totalprice = 0;
-      for (i in data) {
-        var quantity = parseInt(data[i].quantity);
-        cartcount = cartcount + quantity;
-        var tprice = parseInt(data[i].price);
-        totalprice = totalprice + tprice * quantity;
-      }
-      document.querySelector(".cartcounting").innerHTML = cartcount;
-
-      document.querySelector(".totalamount").innerHTML = totalprice;
-
-      var main = "";
-      for (i in data) {
-        main += ` <div class="col-12 mt-3"><div class="card p-2 h-100" >
+  if (sessionStorage.getItem("username") == null) {
+    document.querySelector(
+      "#ShoppingCartBody"
+    ).innerHTML = `<h6 class="text-danger text-center">Please Login First to add items to Cart</h6>`;
+    fetch("https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart")
+      .then((res) => res.json())
+      .then((data) => {
+        for (var i in data) {
+          fetch(
+            `https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart/${data[i].id}`,
+            {
+              method: "DELETE",
+            }
+          );
+        }
+      });
+  } else {
+    let json_url =
+      "https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart";
+    fetch(json_url)
+      .then((res) => res.json())
+      .then((data) => {
+        var cartcount = 0;
+        var totalprice = 0;
+        for (i in data) {
+          var quantity = parseInt(data[i].quantity);
+          cartcount = cartcount + quantity;
+          var tprice = parseInt(data[i].price);
+          totalprice = totalprice + tprice * quantity;
+        }
+        document.querySelector(".cartcounting").innerHTML = cartcount;
+        if (cartcount == 0) {
+          document.querySelector(
+            "#ShoppingCartBody"
+          ).innerHTML = `<h6 class="text-center text-danger">No items in your cart</h6>`;
+        } else {
+          document.querySelector(
+            ".spc_footer"
+          ).innerHTML = ` <div class=" p-5 bg-light ">
+                         <div class="d-flex justify-content-start align-items-center gap-5 text-dark ">
+                             <span class="h4"><span>Total: </span><span class="text-success totalamount">0</span> RS</span>
+                             <a class="btn btn-outline-success" href="#" style="box-shadow: 2px 2px black;">Checkout</a>
+                         </div>
+                     </div>`;
+          document.querySelector(".totalamount").innerHTML = totalprice;
+          var main = "";
+          for (var i in data) {
+            main += ` <div class="col-12 mt-3"><div class="card p-2 h-100" >
                             <div class="row d-flex justify-content-center align-item-center">
                                 <div class="col-md-4 col-sm-2 col-lg-4 p-2" style="max-width:60px">
                                     <img src="${data[i].img}"
@@ -298,40 +321,42 @@ let shoppingcart = () => {
                                 </div>
                             </div>
                         </div></div>`;
-        document.querySelector("#ShoppingCartBody").innerHTML = main;
-        let deletebtn = document.querySelectorAll(".delete");
-        for (let i = 0; i < deletebtn.length; i++) {
-          deletebtn[i].addEventListener("click", () => {
-            if (data[i].quantity > 1) {
-              data[i].quantity = parseInt(data[i].quantity) - 1;
-              fetch(
-                `https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart/${data[i].id}`,
-                {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(data[i]),
+            document.querySelector("#ShoppingCartBody").innerHTML = main;
+            let deletebtn = document.querySelectorAll(".delete");
+            for (let i = 0; i < deletebtn.length; i++) {
+              deletebtn[i].addEventListener("click", () => {
+                if (data[i].quantity > 1) {
+                  data[i].quantity = parseInt(data[i].quantity) - 1;
+                  fetch(
+                    `https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart/${data[i].id}`,
+                    {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify(data[i]),
+                    }
+                  );
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 800);
+                } else {
+                  fetch(
+                    `https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart/${data[i].id}`,
+                    {
+                      method: "DELETE",
+                    }
+                  );
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 800);
                 }
-              );
-              setTimeout(() => {
-                window.location.reload();
-              }, 800);
-            } else {
-              fetch(
-                `https://663647d4415f4e1a5e26de9c.mockapi.io/E-Project/Addtocart/${data[i].id}`,
-                {
-                  method: "DELETE",
-                }
-              );
-              setTimeout(() => {
-                window.location.reload();
-              }, 800);
+              });
             }
-          });
+          }
         }
-      }
-    });
+      });
+  }
 };
 let footer = `  <div class="container-fluid py-5 px-5 bg bg-white text-black-50 mb-5 mt-5 position-relative">
 
@@ -418,7 +443,11 @@ let footer = `  <div class="container-fluid py-5 px-5 bg bg-white text-black-50 
         </div>`;
 let spintimer = () => {
   setTimeout(() => {
-    document.querySelector("#spinloader").style.display = "none";
+    try {
+      document.querySelector("#spinloader").style.display = "none";
+    } catch (error) {
+      console.error(error);
+    }
   }, 2000);
 };
 
